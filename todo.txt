@@ -1,0 +1,5 @@
+* Implement reading of thermistor (this is kind of imporant).
+
+* Implement some kind of serial interface to allow for changing of constants.
+
+* Implement scheduling.
