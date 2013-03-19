@@ -100,8 +100,10 @@ void setup()
 {
     pinMode(OCC_PIN, INPUT);
     digitalWrite(OCC_PIN, HIGH); // enable pull-up resistor
-    pinMode(TT_PIN, OUTPUT);
-    digitalWrite(TT_PIN, LOW);
+    pinMode(HEAT_PIN, OUTPUT);
+    digitalWrite(HEAT_PIN, LOW);
+    pinMode(COOL_PIN, OUTPUT);
+    digitalWrite(COOL_PIN, LOW);
     last_event = millis();
     Serial.begin(9600);
     delay(1000);
@@ -114,11 +116,11 @@ void loop()
     switch(get_operating_mode())
     {
 
-    HEAT_MODE:
+    case HEAT_MODE:
         heat_logic();
         break;
 
-    COOL_MODE:
+    case COOL_MODE:
         cool_logic();
         break;
 
@@ -140,11 +142,11 @@ void calc_setpoint()
     switch(get_operating_mode())
     {
 
-    HEAT_MODE:
+    case HEAT_MODE:
         setpoint = check_occupancy() ? HEAT_OCC_SP : HEAT_UNOCC_SP;
         break;
 
-    COOL_MODE:
+    case COOL_MODE:
         setpoint = check_occupancy() ? COOL_OCC_SP : COOL_UNOCC_SP;
         break;
 
