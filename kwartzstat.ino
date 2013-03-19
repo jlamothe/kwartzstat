@@ -30,6 +30,9 @@
 /// \brief The cooling demand pin.
 #define COOL_PIN 4
 
+/// \brief The fan override pin.
+#define FAN_PIN 5
+
 /// \brief The input pin (analog) for the temperature sensor.
 #define TEMP_PIN 0
 
@@ -60,6 +63,12 @@
 /// \brief Cooling mode:
 #define COOL_MODE 2
 
+/// \brief Heating override mode:
+#define HEAT_OVER 3
+
+/// \brief Coolding override mode:
+#define COOL_OVER 4
+
 // GLOBAL VARIABLES:
 
 /// \brief The actual temperature (in Celsius).
@@ -89,6 +98,9 @@ double calc_setpoint(void);
 /// mode, or OFF_MODE if disabled.
 int get_operating_mode(void);
 
+/// \brief Sets the outputs.
+void set_outputs(void);
+
 /// \brief Heating mode logic.
 void heat_logic(void);
 
@@ -98,6 +110,10 @@ void cool_logic(void);
 /// \brief Checks the occupancy of the building.
 /// \return true if the building is occupied, false otherwise.
 bool check_occupancy(void);
+
+/// \brief Checks the fan override.
+/// \return true if the fan is in override, false otherwise.
+bool check_fan_override(void);
 
 // FUNCTION DEFINITIONS:
 
@@ -119,22 +135,7 @@ void loop()
     act_temp = read_temp();
     setpoint = calc_setpoint();
     mode = get_operating_mode();
-    switch(mode)
-    {
-
-    case HEAT_MODE:
-        heat_logic();
-        break;
-
-    case COOL_MODE:
-        cool_logic();
-        break;
-
-    default:
-        digitalWrite(HEAT_PIN, LOW);
-        digitalWrite(COOL_PIN, LOW);
-
-    }
+    set_outputs();
 }
 
 double read_temp()
@@ -164,6 +165,38 @@ int get_operating_mode()
     return HEAT_MODE;
 }
 
+void set_outputs()
+{
+    switch(mode)
+    {
+
+    case HEAT_MODE:
+        heat_logic();
+        break;
+
+    case COOL_MODE:
+        cool_logic();
+        break;
+
+    case HEAT_OVER:
+      digitalWrite(HEAT_PIN, HIGH);
+      digitalWrite(COOL_PIN, LOW);
+      break;
+
+    case COOL_OVER:
+      digitalWrite(HEAT_PIN, LOW);
+      digitalWrite(COOL_PIN, HIGH);
+      break;
+
+    default:
+        digitalWrite(HEAT_PIN, LOW);
+        digitalWrite(COOL_PIN, LOW);
+
+    }
+
+    digitalWrite(FAN_PIN, check_fan_override());
+}
+
 void heat_logic()
 {
     digitalWrite(COOL_PIN, LOW);
@@ -187,6 +220,12 @@ bool check_occupancy()
     if(digitalRead(OCC_PIN) == LOW)
         last_event = millis();
     return millis() - last_event < (OCC_TIMEOUT * 1000ul * 60ul);
+}
+
+bool check_fan_override(void)
+{
+  // TODO: implement fan override
+  return false;
 }
 
 // jl

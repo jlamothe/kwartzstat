@@ -5,3 +5,5 @@
 * Implement some kind of serial interface to allow for changing of constants.
 
 * Implement scheduling.
+
+* Implement overrides
