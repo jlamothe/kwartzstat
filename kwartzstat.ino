@@ -224,8 +224,8 @@ bool check_occupancy()
 
 bool check_fan_override(void)
 {
-  // TODO: implement fan override
-  return false;
+    // TODO: implement fan override
+    return false;
 }
 
 // jl
