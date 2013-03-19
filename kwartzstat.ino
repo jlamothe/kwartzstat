@@ -68,16 +68,21 @@ double act_temp;
 /// \brief The temperature setpoint (in Celsius).
 double setpoint;
 
+/// \brief Operating mode.
+int mode;
+
 /// \brief The time of the last event (in ms).
 unsigned long last_event;
 
 // FUNCTION PROTOTYPES:
 
 /// \brief Reads the actual temperature.
-void read_temp(void);
+/// \return The temperature.
+double read_temp(void);
 
 /// \brief Calculates the setpoint.
-void calc_setpoint(void);
+/// \return The calculated setpoint.
+double calc_setpoint(void);
 
 /// \brief Determines the operating mode.
 /// \return HEAT_MODE if in heating mode, COOL_MODE if in cooling
@@ -111,9 +116,10 @@ void setup()
 
 void loop()
 {
-    read_temp();
-    calc_setpoint();
-    switch(get_operating_mode())
+    act_temp = read_temp();
+    setpoint = calc_setpoint();
+    mode = get_operating_mode();
+    switch(mode)
     {
 
     case HEAT_MODE:
@@ -131,29 +137,25 @@ void loop()
     }
 }
 
-void read_temp()
+double read_temp()
 {
     // TODO: implement temperature reading
-    act_temp = 0;
+    return 0;
 }
 
-void calc_setpoint()
+double calc_setpoint()
 {
-    switch(get_operating_mode())
+    switch(mode)
     {
 
     case HEAT_MODE:
-        setpoint = check_occupancy() ? HEAT_OCC_SP : HEAT_UNOCC_SP;
-        break;
+        return check_occupancy() ? HEAT_OCC_SP : HEAT_UNOCC_SP;
 
     case COOL_MODE:
-        setpoint = check_occupancy() ? COOL_OCC_SP : COOL_UNOCC_SP;
-        break;
-
-    default:
-        setpoint = 0;
+        return check_occupancy() ? COOL_OCC_SP : COOL_UNOCC_SP;
 
     }
+    return 0;
 }
 
 int get_operating_mode()
