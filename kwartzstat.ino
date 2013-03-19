@@ -95,7 +95,8 @@ double calc_setpoint(void);
 
 /// \brief Determines the operating mode.
 /// \return HEAT_MODE if in heating mode, COOL_MODE if in cooling
-/// mode, or OFF_MODE if disabled.
+/// mode, HEAT_OVER if in heating override mode, COOL_OVER if in
+/// cooling override mode, or OFF_MODE if disabled.
 int get_operating_mode(void);
 
 /// \brief Sets the outputs.
