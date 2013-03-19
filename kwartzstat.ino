@@ -24,23 +24,41 @@
 /// \brief The input pin for the occupancy switch.
 #define OCC_PIN 2
 
-/// \brief The thermostat output pin (would need to drive a relay).
-#define TT_PIN 3
+/// \brief The heat demand pin.
+#define HEAT_PIN 3
+
+/// \brief The cooling demand pin.
+#define COOL_PIN 4
 
 /// \brief The input pin (analog) for the temperature sensor.
 #define TEMP_PIN 0
 
-/// \brief The occupied setpoint (in Celsius).
-#define OCC_SP 23
+/// \brief The occupied setpoint in heating mode (in Celsius).
+#define HEAT_OCC_SP 23
 
-/// \brief The unoccupied setpoint (in Celsius).
-#define UNOCC_SP 18
+/// \brief The unoccupied setpoint in heating mode (in Celsius).
+#define HEAT_UNOCC_SP 18
+
+/// \brief The occupied setpoint in cooling mode (in Celsius).
+#define COOL_OCC_SP 25
+
+/// \brief The unoccupied setpoint in cooling mode (in Celsius).
+#define COOL_UNOCC_SP 30
 
 /// \brief The thermostat deadband (in Celsius).
 #define DEADBAND 2
 
 /// \brief The occupancy timeout (in minutes).
 #define OCC_TIMEOUT 30
+
+/// \brief Off mode:
+#define OFF_MODE 0
+
+/// \brief Heating mode:
+#define HEAT_MODE 1
+
+/// \brief Cooling mode:
+#define COOL_MODE 2
 
 // GLOBAL VARIABLES:
 
@@ -60,6 +78,17 @@ void read_temp(void);
 
 /// \brief Calculates the setpoint.
 void calc_setpoint(void);
+
+/// \brief Determines the operating mode.
+/// \return HEAT_MODE if in heating mode, COOL_MODE if in cooling
+/// mode, or OFF_MODE if disabled.
+int get_operating_mode(void);
+
+/// \brief Heating mode logic.
+void heat_logic(void);
+
+/// \brief Cooling mode logic.
+void cool_logic(void);
 
 /// \brief Checks the occupancy of the building.
 /// \return true if the building is occupied, false otherwise.
@@ -82,10 +111,22 @@ void loop()
 {
     read_temp();
     calc_setpoint();
-    if(act_temp <= setpoint - (DEADBAND / 2.0))
-        digitalWrite(TT_PIN, HIGH);
-    else if(act_temp >= setpoint + (DEADBAND / 2.0))
-        digitalWrite(TT_PIN, LOW);
+    switch(get_operating_mode())
+    {
+
+    HEAT_MODE:
+        heat_logic();
+        break;
+
+    COOL_MODE:
+        cool_logic();
+        break;
+
+    default:
+        digitalWrite(HEAT_PIN, LOW);
+        digitalWrite(COOL_PIN, LOW);
+
+    }
 }
 
 void read_temp()
@@ -96,7 +137,45 @@ void read_temp()
 
 void calc_setpoint()
 {
-    setpoint = check_occupancy() ? OCC_SP : UNOCC_SP;
+    switch(get_operating_mode())
+    {
+
+    HEAT_MODE:
+        setpoint = check_occupancy() ? HEAT_OCC_SP : HEAT_UNOCC_SP;
+        break;
+
+    COOL_MODE:
+        setpoint = check_occupancy() ? COOL_OCC_SP : COOL_UNOCC_SP;
+        break;
+
+    default:
+        setpoint = 0;
+
+    }
+}
+
+int get_operating_mode()
+{
+    // TODO: implement operating mode
+    return HEAT_MODE;
+}
+
+void heat_logic()
+{
+    digitalWrite(COOL_PIN, LOW);
+    if(act_temp <= setpoint - (DEADBAND / 2.0))
+        digitalWrite(HEAT_PIN, HIGH);
+    else if(act_temp >= setpoint + (DEADBAND / 2.0))
+        digitalWrite(HEAT_PIN, LOW);
+}
+
+void cool_logic()
+{
+    digitalWrite(HEAT_PIN, LOW);
+    if(act_temp <= setpoint - (DEADBAND / 2.0))
+        digitalWrite(COOL_PIN, LOW);
+    else if(act_temp >= setpoint + (DEADBAND / 2.0))
+        digitalWrite(COOL_PIN, HIGH);
 }
 
 bool check_occupancy()
