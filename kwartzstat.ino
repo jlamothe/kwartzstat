@@ -126,6 +126,8 @@ void setup()
     digitalWrite(HEAT_PIN, LOW);
     pinMode(COOL_PIN, OUTPUT);
     digitalWrite(COOL_PIN, LOW);
+    pinMode(FAN_PIN, OUTPUT);
+    digitalWrite(FAN_PIN, LOW);
     last_event = millis();
     Serial.begin(9600);
     delay(1000);
