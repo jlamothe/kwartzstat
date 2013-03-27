@@ -18,4 +18,4 @@ along with this program.  If not, see: http://www.gnu.org/licenses/
 * * *
 
 This is the proposed source code for an Arduino-based thermostat at
-kwartzlab.
+kwartzlab.  It requires the sen10k library.
